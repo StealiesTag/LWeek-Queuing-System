@@ -17,12 +17,12 @@ app.get("/api/queue", async (req, res) => {
 });
 
 app.post("/api/queue", async (req, res) => {
-    const { name } = req.body;
-    console.log("Name received:", req.body);
+    const { name, indiv, reservation } = req.body;
+    console.log("Data received:", req.body);
 
     const result = await pool.query(
-        "INSERT INTO queue_entries (name) VALUES ($1) RETURNING *",
-        [name]
+        "INSERT INTO queue_entries (name, reservation, indiv) VALUES ($1, $2, $3) RETURNING *",
+        [name, reservation, indiv]
     );
 
     res.json(result.rows[0]);
