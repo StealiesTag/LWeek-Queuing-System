@@ -6,8 +6,9 @@ function App() {
     const [indiv, setIndiv] = useState("");
     const [reservation, setReservation] = useState("");
     const [error, setError] = useState("");
-
+    const [success, setSuccess] = useState("");
     const [queue, setQueue] = useState<QueueEntry[]>([]);
+    const [total, setTotal] = useState(0);
 
     interface QueueEntry {
         id: number;
@@ -16,6 +17,13 @@ function App() {
         reservation: string;
     }
     
+    const getTotal = async () => {
+        const response = await fetch("http://localhost:3000/api/queue");
+        const data = await response.json();
+        const total = data.reduce((sum, entry) => sum + entry.indiv, 0);
+        setTotal(total);
+    }
+
     const getQueue = async () => {
             const response = await fetch("http://localhost:3000/api/queue");
             const data = await response.json();
@@ -23,7 +31,7 @@ function App() {
         }
 
 
-    useEffect(() => {getQueue();}, []);
+    useEffect(() => {getQueue(); getTotal();}, []);
     
 
     const joinQueue = async () => {
@@ -51,62 +59,110 @@ function App() {
             return;
         }
         setError("");
-console.log("Successfully joined:", data);
+        setSuccess("Successfully joined the queue!");
+        
 
         await getQueue(); 
+        await getTotal();
         console.log(data);
     };
 
-    return (
-        
-        <div>
-            <h1>Queue thingy</h1>
-            {error && <p>{error}</p>}
-            <input
-                placeholder="Enter your name"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-            />
-            <input
-                placeholder="Enter number of people"
-                value={indiv}
-                onChange={(event) => setIndiv(event.target.value)}
-            />
-            <input
-                placeholder="Enter reservation time in HH:MM:SS"
-                value={reservation}
-                onChange={(event) => setReservation(event.target.value)}
-            />
-            
+return (
+    <div className="app">
+        <div className="container">
 
-            <button onClick={joinQueue}>Join Queue</button>
+            <header className="header">
+                <h1>Queue thingy</h1>
+            </header>
 
-            <div className="queue-table-wrapper">
-                <table className="queue-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Individuals</th>
-                            <th>Reservation</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {queue.map((entry) => (
-                            <tr key={entry.id}>
-                                <td>{entry.id}</td>
-                                <td>{entry.name}</td>
-                                <td>{entry.indiv}</td>
-                                <td>{entry.reservation}</td>
+            <section className="queue-card">
+                <h3>{total} people have visited our booth!</h3>
+                  <h2>Input Information</h2>
+
+                {error && (
+                    <div className="error-message">
+                        {error}
+                    </div>
+                )}
+
+                {success && (
+                    <div className="success-message">
+                        {success}
+                    </div>
+                )}
+
+                <div className="form">
+                    <div className="form-group">
+                        <label>Name</label>
+                        <input
+                            placeholder="Enter your name"
+                            value={name}
+                            onChange={(event) => setName(event.target.value)}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Number of People</label>
+                        <input
+                            type="number"
+                            min="1"
+                            placeholder="e.g. 3"
+                            value={indiv}
+                            onChange={(event) => setIndiv(event.target.value)}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Reservation Time</label>
+                        <input
+                            type="time"
+                            step="1200"
+                            value={reservation}
+                            onChange={(event) => setReservation(event.target.value)}
+                        />
+                    </div>
+
+                    <button className="join-button" onClick={joinQueue}>
+                        Join Queue
+                    </button>
+                </div>
+            </section>
+
+            <section className="queue-card">
+                <div className="queue-header">
+                    <div>
+                        <h2>Current Queue</h2>
+                        <p>{queue.length} reservation(s)</p>
+                    </div>
+                </div>
+
+                <div className="queue-table-wrapper">
+                    <table className="queue-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>People</th>
+                                <th>Reservation</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
 
-            
+                        <tbody>
+                            {queue.map((entry) => (
+                                <tr key={entry.id}>
+                                    <td>{entry.id}</td>
+                                    <td>{entry.name}</td>
+                                    <td>{entry.indiv}</td>
+                                    <td>{entry.reservation}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
         </div>
-    );
+    </div>
+);
 }
-
 export default App;

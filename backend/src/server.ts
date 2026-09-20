@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
 });
 
 app.get("/api/queue", async (req, res) => {
-    const result = await pool.query("SELECT * FROM queue_entries ORDER BY id");
+    const result = await pool.query("SELECT * FROM queue_entries ORDER BY id DESC");
     
     res.json(result.rows);
 });
