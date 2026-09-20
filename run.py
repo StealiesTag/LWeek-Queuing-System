@@ -8,10 +8,16 @@ procs = [
     subprocess.Popen("npm run dev", cwd=root / "frontend", shell=True),
 ]
 
+def kill(p):
+    if sys.platform == "win32":
+        subprocess.run(["taskkill", "/F", "/T", "/PID", str(p.pid)], capture_output=True)
+    else:
+        p.terminate()
+
 try:
     for p in procs:
         p.wait()
 except KeyboardInterrupt:
     for p in procs:
-        p.terminate()
+        kill(p)
     sys.exit(0)
