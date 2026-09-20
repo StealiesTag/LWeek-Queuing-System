@@ -1,0 +1,27 @@
+.queue-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 24px;
+}
+
+.queue-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.queue-table th,
+.queue-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.queue-table th {
+    color: var(--text-h);
+    font-weight: 600;
+    background: var(--code-bg);
+}
+
+.queue-table tbody tr:hover {
+    background: var(--accent-bg);
+}

@@ -20,6 +20,18 @@ app.post("/api/queue", async (req, res) => {
     const { name, indiv, reservation } = req.body;
     console.log("Data received:", req.body);
 
+    const collision = await pool.query(
+        "SELECT * FROM queue_entries WHERE reservation < $1::TIME + INTERVAL '20 minutes' AND reservation + INTERVAL '20 minutes' > $1::TIME",
+        [reservation]
+    );
+    console.log("Reservation being checked:", reservation);
+    console.log("Collisions found:", collision.rows);
+
+    if (collision.rows.length > 0) {
+        return res.status(400).json({ error: "Reservation time conflicts with an existing entry. Please select another time." });
+    }
+
+    console.log("NO COLLISION — INSERTING");
     const result = await pool.query(
         "INSERT INTO queue_entries (name, reservation, indiv) VALUES ($1, $2, $3) RETURNING *",
         [name, reservation, indiv]

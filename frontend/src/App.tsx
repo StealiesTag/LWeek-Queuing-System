@@ -1,27 +1,37 @@
 import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
     const [name, setName] = useState("");
     const [indiv, setIndiv] = useState("");
     const [reservation, setReservation] = useState("");
+    const [error, setError] = useState("");
 
-    const [queue, setQueue] = useState([]);
+    const [queue, setQueue] = useState<QueueEntry[]>([]);
+
+    interface QueueEntry {
+        id: number;
+        name: string;
+        indiv: number;
+        reservation: string;
+    }
     
-    useEffect(() => {
-        const getQueue = async () => {
+    const getQueue = async () => {
             const response = await fetch("http://localhost:3000/api/queue");
             const data = await response.json();
             setQueue(data);
         }
-        getQueue();
-    }, []);
+
+
+    useEffect(() => {getQueue();}, []);
     
+
     const joinQueue = async () => {
         console.log("Joining queue...");
         console.log("Name:", name);
         console.log("Individuals:", indiv);
         console.log("Reservation:", reservation);
-
+        
         const response = await fetch("http://localhost:3000/api/queue", {
             method: "POST",
             headers: {
@@ -31,18 +41,27 @@ function App() {
                 name: name,
                 indiv: parseInt(indiv),
                 reservation: reservation
-            })
+            }) 
         });
+       
 
         const data = await response.json();
+        if (!response.ok) {
+            setError(data.error);
+            return;
+        }
+        setError("");
+console.log("Successfully joined:", data);
 
+        await getQueue(); 
         console.log(data);
     };
 
     return (
+        
         <div>
-            <h1>School Queue</h1>
-
+            <h1>Queue thingy</h1>
+            {error && <p>{error}</p>}
             <input
                 placeholder="Enter your name"
                 value={name}
@@ -62,7 +81,30 @@ function App() {
 
             <button onClick={joinQueue}>Join Queue</button>
 
-            <h1>{name}, {indiv}, {reservation}</h1>
+            <div className="queue-table-wrapper">
+                <table className="queue-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Individuals</th>
+                            <th>Reservation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {queue.map((entry) => (
+                            <tr key={entry.id}>
+                                <td>{entry.id}</td>
+                                <td>{entry.name}</td>
+                                <td>{entry.indiv}</td>
+                                <td>{entry.reservation}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            
         </div>
     );
 }
