@@ -32,29 +32,33 @@ function App() {
         console.log("Individuals:", indiv);
         console.log("Reservation:", reservation);
         
-        const response = await fetch("http://localhost:3000/api/queue", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name: name,
-                indiv: parseInt(indiv),
-                reservation: reservation
-            }) 
-        });
-       
+        try {
+            const response = await fetch("http://localhost:3000/api/queue", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: name,
+                    indiv: parseInt(indiv),
+                    reservation: reservation
+                })
+            });
 
-        const data = await response.json();
-        if (!response.ok) {
-            setError(data.error);
-            return;
+            if (!response.ok) {
+                const data = await response.json().catch(() => null);
+                setError(data?.error ?? "Something went wrong. Please try again.");
+                return;
+            }
+
+            const data = await response.json();
+            setError("");
+            await getQueue();
+            console.log("Successfully joined:", data);
+        } catch (err) {
+            console.error(err);
+            setError("Could not reach the server. Please try again.");
         }
-        setError("");
-console.log("Successfully joined:", data);
-
-        await getQueue(); 
-        console.log(data);
     };
 
     return (
@@ -68,12 +72,15 @@ console.log("Successfully joined:", data);
                 onChange={(event) => setName(event.target.value)}
             />
             <input
+                type="number"
+                min="1"
                 placeholder="Enter number of people"
                 value={indiv}
                 onChange={(event) => setIndiv(event.target.value)}
             />
             <input
-                placeholder="Enter reservation time in HH:MM:SS"
+                type="time"
+                step="1"
                 value={reservation}
                 onChange={(event) => setReservation(event.target.value)}
             />
