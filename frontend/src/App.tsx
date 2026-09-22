@@ -4,7 +4,9 @@ import "./App.css";
 function App() {
     const [name, setName] = useState("");
     const [indiv, setIndiv] = useState("");
+    const [ID, setID] = useState("");
     const [reservation, setReservation] = useState("");
+    const [date, setDate] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [queue, setQueue] = useState<QueueEntry[]>([]);
@@ -29,7 +31,12 @@ function App() {
             const data = await response.json();
             setQueue(data);
         }
-
+    
+    const searchQueue = async () => {
+        const response = await fetch(`http://localhost:3000/api/queue?action=/search&name=${name}&ID=${ID}&date=${date}`);
+        const data = await response.json();
+        setQueue(data);
+    }
 
     useEffect(() => {getQueue(); getTotal();}, []);
     
@@ -75,9 +82,17 @@ return (
                 <h1>Queue thingy</h1>
             </header>
 
+            <nav className="search-navbar" aria-label="Queue search">
+                <form className="search-form" action="/search" method="POST">
+                    <input type="search" name="id" value={ID} onChange={(event) => setID(event.target.value)} placeholder="Search ID..." />
+                    <input type="search" name="name" placeholder="Search name..." />
+                    <input type="search" name="create" value={date} onChange={(event) => setDate(event.target.value)} placeholder="Search date created..." />
+                    <button type="submit" onClick={searchQueue} aria-label="Search">Find</button>
+                </form>
+            </nav>
+
             <section className="queue-card">
                 <h3>{total} people have visited our booth!</h3>
-                  <h2>Input Information</h2>
 
                 {error && (
                     <div className="error-message">

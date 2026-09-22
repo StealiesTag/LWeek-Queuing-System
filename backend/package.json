@@ -26,6 +26,7 @@
   "allowScripts": {
     "pg@8.23.0": true,
     "cors@2.8.6": true,
-    "@types/cors@2.8.19": true
+    "@types/cors@2.8.19": true,
+    "esbuild@0.28.2": true
   }
 }

@@ -13,11 +13,46 @@ app.get('/', (req, res) => {
 app.get("/api/queue", async (req, res) => {
     const result = await pool.query("SELECT * FROM queue_entries ORDER BY id DESC");
     
-    res.json(result.rows);
-});
+    const { action, name, ID, date } = req.query;
 
+    if (action === "/search") {
+
+    const conditions = [];
+    const values = [];
+
+    if (name) {
+        conditions.push(`name ILIKE $${values.length + 1}`);
+        values.push(`%${name}%`);
+    }
+
+    if (ID) {
+        conditions.push(`id = $${values.length + 1}`);
+        values.push(ID);
+    }
+
+    if (date) {
+        conditions.push(`created_at::date = $${values.length + 1}`);
+        values.push(date);
+    }
+
+    if (conditions.length === 0) {
+        return res.json([]);
+    }
+
+    const response = await pool.query(
+        `SELECT * FROM queue_entries
+         WHERE ${conditions.join(" OR ")}`,
+        values
+    );
+
+    return res.json(response.rows);
+}
+    return res.json(result.rows);
+});
+ 
 app.post("/api/queue", async (req, res) => {
     const { name, indiv, reservation } = req.body;
+
     console.log("Data received:", req.body);
 
     const collision = await pool.query(
