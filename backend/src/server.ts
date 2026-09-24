@@ -13,16 +13,26 @@ app.get('/', (req, res) => {
 app.get("/api/queue", async (req, res) => {
     const result = await pool.query("SELECT * FROM queue_entries ORDER BY id DESC");
     
-    const { action, name, ID, date } = req.query;
+    const { action, name, ID, date, time } = req.query;
+   
+
+console.log("QUERY:", req.query);
+console.log("ACTION:", action);
+console.log("NAME:", name);
+console.log("ID:", ID);
+console.log("DATE:", date);
+console.log("TIME:", time);
+    
 
     if (action === "/search") {
+    console.log('Checking')
 
     const conditions = [];
     const values = [];
 
     if (name) {
         conditions.push(`name ILIKE $${values.length + 1}`);
-        values.push(`%${name}%`);
+        values.push(name);
     }
 
     if (ID) {
@@ -31,20 +41,25 @@ app.get("/api/queue", async (req, res) => {
     }
 
     if (date) {
-        conditions.push(`created_at::date = $${values.length + 1}`);
+        conditions.push(`created_date = $${values.length + 1}`);
         values.push(date);
+    }
+    if (time) {
+        conditions.push(`TO_CHAR(created_time, 'HH24:MI') = $${values.length + 1}`);
+        values.push(time);
     }
 
     if (conditions.length === 0) {
-        return res.json([]);
+        return res.json(result.rows);
     }
-
+    console.log("CONDITIONS:", conditions);
+console.log("VALUES:", values);
     const response = await pool.query(
         `SELECT * FROM queue_entries
          WHERE ${conditions.join(" OR ")}`,
         values
     );
-
+    console.log("RESULT:", response.rows);
     return res.json(response.rows);
 }
     return res.json(result.rows);

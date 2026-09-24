@@ -7,6 +7,7 @@ function App() {
     const [ID, setID] = useState("");
     const [reservation, setReservation] = useState("");
     const [date, setDate] = useState("");
+    const [time, setTime] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [queue, setQueue] = useState<QueueEntry[]>([]);
@@ -33,7 +34,7 @@ function App() {
         }
     
     const searchQueue = async () => {
-        const response = await fetch(`http://localhost:3000/api/queue?action=/search&name=${name}&ID=${ID}&date=${date}`);
+        const response = await fetch(`http://localhost:3000/api/queue?action=/search&name=${name}&ID=${ID}&date=${date}&time=${time}`);
         const data = await response.json();
         setQueue(data);
     }
@@ -81,15 +82,6 @@ return (
             <header className="header">
                 <h1>Queue thingy</h1>
             </header>
-
-            <nav className="search-navbar" aria-label="Queue search">
-                <form className="search-form" action="/search" method="POST">
-                    <input type="search" name="id" value={ID} onChange={(event) => setID(event.target.value)} placeholder="Search ID..." />
-                    <input type="search" name="name" placeholder="Search name..." />
-                    <input type="search" name="create" value={date} onChange={(event) => setDate(event.target.value)} placeholder="Search date created..." />
-                    <button type="submit" onClick={searchQueue} aria-label="Search">Find</button>
-                </form>
-            </nav>
 
             <section className="queue-card">
                 <h3>{total} people have visited our booth!</h3>
@@ -150,6 +142,15 @@ return (
                         <p>{queue.length} reservation(s)</p>
                     </div>
                 </div>
+                  <nav className="search-navbar" aria-label="Queue search">
+                <form className="search-form" onSubmit={(event) => {event.preventDefault();searchQueue();}} >
+                    <input type="search" name="id" value={ID} onChange={(event) => setID(event.target.value)} placeholder="Search ID..." />
+                    <input type="search" name="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Search name..." />
+                    <input type="date" name="create" value={date} onChange={(event) => setDate(event.target.value)} placeholder="Search date created..." />
+                    <input type="time" name="create" value={time} onChange={(event) => setTime(event.target.value)} placeholder="Search time created..." />
+                    <button type="submit" aria-label="Search">Find</button>
+                </form>
+            </nav>
 
                 <div className="queue-table-wrapper">
                     <table className="queue-table">
