@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./App.css";
+import "../App.css";
 function queuePage(){
     const [name, setName] = useState("");
     const [indiv, setIndiv] = useState("");
@@ -11,6 +11,7 @@ function queuePage(){
     const [success, setSuccess] = useState("");
     const [queue, setQueue] = useState<QueueEntry[]>([]);
     const [total, setTotal] = useState(0);
+   
 
     interface QueueEntry {
         id: number;

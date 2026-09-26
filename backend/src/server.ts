@@ -90,6 +90,16 @@ app.post("/api/queue", async (req, res) => {
     res.json(result.rows[0]);
 });
 
+app.get("api/live", async (req, res) => {
+    
+    return
+});
+
+app.post("/api/live", express.raw({type: "image/jpeg", limit: "10mb"}), async (req, res) => {
+    const imageFrame = req.body;
+    res.send("Image received");
+});
+
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");

@@ -6,6 +6,7 @@ root = __import__("pathlib").Path(__file__).parent
 procs = [
     subprocess.Popen("npx tsx src/server.ts", cwd=root / "backend", shell=True),
     subprocess.Popen("npm run dev", cwd=root / "frontend", shell=True),
+    subprocess.Popen("python livefeed.py", cwd=root / "backend/src", shell=True),
 ]
 
 def kill(p):

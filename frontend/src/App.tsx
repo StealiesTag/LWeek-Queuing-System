@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import QueuePage from "./pages/queue.tsx";
-import AdminPage from "./pages/live.tsx";
+import LivePage from "./pages/live.tsx";
 
 function App() {
     return (
@@ -9,9 +9,9 @@ function App() {
 
             <Routes>
 
-                <Route path="/" element={<QueuePage />} />
+                <Route path="/api/queue" element={<QueuePage />} />
 
-                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/api/live" element={<LivePage />} />
 
             </Routes>
 
